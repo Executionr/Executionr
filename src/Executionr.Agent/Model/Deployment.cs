@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Executionr.Agent.Model
 {
-	public class Deployment
-	{
+    public class Deployment
+    {
         [Required]
         public int Id { get; set; }
 
@@ -16,6 +16,6 @@ namespace Executionr.Agent.Model
 
         [Required]
         public string Hash { get; set; }
-	}
+    }
 }
 

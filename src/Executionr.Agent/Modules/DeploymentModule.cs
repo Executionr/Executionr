@@ -12,20 +12,20 @@ using Nancy.Validation;
 
 namespace Executionr.Agent
 {
-	public class DeployModule : NancyModule
-	{
+    public class DeploymentModule : NancyModule
+    {
         private IDocumentSession _session;
         private IObjectMapper _mapper;
 
-        public DeployModule(IDocumentSession session, IObjectMapper mapper) : base("/deployments")
-		{
+        public DeploymentModule(IDocumentSession session, IObjectMapper mapper) : base("/deployments")
+        {
             this._session = session;
             this._mapper = mapper;
 
-            Get["/{id}"] = OnGet;
-            Get["/"] = OnList;
-            Post["/"] = OnAdd;
-		}
+            Get ["/{id}"] = OnGet;
+            Get ["/"] = OnList;
+            Post ["/"] = OnAdd;
+        }
 
         private dynamic OnGet(dynamic arg)
         {
@@ -35,36 +35,38 @@ namespace Executionr.Agent
             if (deployment != null)
             {
                 return Response.AsJson(_mapper.Map<Domain.Deployment, Model.Deployment>(deployment));
-            } 
+            }
             else
             {
                 return 404;
             }
         }
 
-		private dynamic OnList(dynamic arg)
-		{
+        private dynamic OnList(dynamic arg)
+        {
             return Response.AsJson(_mapper.Map<Domain.Deployment, Model.Deployment>(_session.Query<Domain.Deployment>()));
-		}
+        }
 
         private dynamic OnAdd(dynamic arg)
         {
             var model = this.Bind<Model.Deployment>();
             var result = this.Validate(model);
-            var deployment = _mapper.Map<Model.Deployment, Domain.Deployment>(model);
 
             if (result.IsValid)
             {
+                var deployment = _mapper.Map<Model.Deployment, Domain.Deployment>(model);
+                deployment.State = Domain.DeploymentState.Scheduled;
+
                 _session.Store(deployment);
                 _session.SaveChanges();
 
                 return Response.AsCreated("/deployments/" + deployment.Id);
-            } 
+            }
             else
             {
                 return Response.AsValidationError(result);
             }
-		}
-	}
+        }
+    }
 }
 

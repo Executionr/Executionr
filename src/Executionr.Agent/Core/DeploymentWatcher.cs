@@ -2,18 +2,23 @@ using System;
 using System.Threading;
 using Raven.Client;
 using System.Linq;
+using Executionr.Agent.Domain;
+using Executionr.Agent.Core.Steps;
+using System.Collections.Generic;
 
 namespace Executionr.Agent.Core
 {
-    public class DeploymentWatcher : IDisposable
+    public class DeploymentWatcher : IDeploymentWatcher
     {
         private Thread _thread;
         private bool _keepRunning;
-        private IDocumentStore _documentStore;
+        private Func<IDocumentSession> _documentSessionFactory;
+        private Func<IDeploymentPipeline> _pipelineFactory;
 
-        public DeploymentWatcher(IDocumentStore documentStore)
+        public DeploymentWatcher(Func<IDocumentSession> documentSessionFactory, Func<IDeploymentPipeline> pipelineFactory)
         {
-            _documentStore = documentStore;
+            _documentSessionFactory = documentSessionFactory;
+            _pipelineFactory = pipelineFactory;
             _thread = new Thread(OnStart) 
             {
                 IsBackground = true
@@ -42,13 +47,16 @@ namespace Executionr.Agent.Core
             {
                 Thread.Sleep(TimeSpan.FromSeconds(20));
 
-                using (var session = _documentStore.OpenSession()) 
+                using (var session = _documentSessionFactory()) 
                 {
-                    var deployments = session.Query<Domain.Deployment>().Take(5);
+                    var deployments = session.Query<Deployment>()
+                                                .Where(d => d.State == DeploymentState.Scheduled)
+                                                .OrderBy(d => d.CreateDate)
+                                                .Take(5);
 
                     foreach (var deployment in deployments) 
                     {
-                        using (var pipeline = new DeploymentPipeline(session)) 
+                        using (var pipeline = _pipelineFactory()) 
                         {
                             pipeline.Deploy(deployment);
                         }

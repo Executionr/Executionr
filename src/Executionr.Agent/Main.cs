@@ -6,13 +6,13 @@ using NLog;
 
 namespace Executionr.Agent
 {
-	class MainClass
-	{
-		public static void Main (string[] args)
-		{
+    public class MainClass
+    {
+        public static void Main(string[] args)
+        {
             ConfigureLogging();
             InitializeHost();
-		}
+        }
 
         static void ConfigureLogging()
         {
@@ -38,5 +38,5 @@ namespace Executionr.Agent
 
             host.Stop();
         }
-	}
+    }
 }

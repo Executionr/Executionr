@@ -2,6 +2,8 @@ using System;
 using Nancy;
 using Raven.Client;
 using Raven.Client.Embedded;
+using Executionr.Agent.IO;
+using Executionr.Agent.Core.Steps;
 
 namespace Executionr.Agent.Core
 {
@@ -21,10 +23,13 @@ namespace Executionr.Agent.Core
             container.Register<IDocumentStore>(documentStore);
             container.Register<IDocumentSession>((c, o) => c.Resolve<IDocumentStore>().OpenSession());
             container.Register<IObjectMapper, ObjectMapper>().AsSingleton();
+            container.Register<IHasher, Sha256Hasher>().AsSingleton();
+            container.Register<IEnvironment, Environment>().AsSingleton();
+            container.RegisterMultiple<IDeploymentStep>(new [] { typeof(DownloadPackageStep), typeof(UnpackPackageStep), typeof(DeployApplicationStep) }).AsMultiInstance();
+            container.Register<IDeploymentPipeline, DeploymentPipeline>().AsMultiInstance();
+            container.Register<IDeploymentWatcher, DeploymentWatcher>();
 
-            var deploymentWatcher = new DeploymentWatcher(documentStore);
-            deploymentWatcher.Start();
-            container.Register<DeploymentWatcher>(deploymentWatcher);
+            container.Resolve<IDeploymentWatcher>().Start();
         }
     }
 }
