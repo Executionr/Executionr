@@ -94,13 +94,14 @@
     <Reference Include="Nancy.Validation.DataAnnotations">
       <HintPath>..\..\packages\Nancy.Validation.DataAnnotations.0.12.0\lib\net40\Nancy.Validation.DataAnnotations.dll</HintPath>
     </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Model\Deployment.cs" />
-    <Compile Include="Net\IDownloader.cs" />
-    <Compile Include="Net\IDownload.cs" />
     <Compile Include="Core\IObjectMapper.cs" />
     <Compile Include="Core\ObjectMapper.cs" />
     <Compile Include="Core\Bootstrapper.cs" />
@@ -122,6 +123,11 @@
     <Compile Include="Core\DeploymentException.cs" />
     <Compile Include="Core\IDeploymentWatcher.cs" />
     <Compile Include="Core\IDeploymentPipeline.cs" />
+    <Compile Include="Core\IDeploymentLogger.cs" />
+    <Compile Include="Core\DeploymentLogger.cs" />
+    <Compile Include="Net\IWebClient.cs" />
+    <Compile Include="Net\WebClient.cs" />
+    <Compile Include="IO\StreamExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -4,6 +4,7 @@ using Raven.Client;
 using Raven.Client.Embedded;
 using Executionr.Agent.IO;
 using Executionr.Agent.Core.Steps;
+using Executionr.Agent.Net;
 
 namespace Executionr.Agent.Core
 {
@@ -28,6 +29,7 @@ namespace Executionr.Agent.Core
             container.RegisterMultiple<IDeploymentStep>(new [] { typeof(DownloadPackageStep), typeof(UnpackPackageStep), typeof(DeployApplicationStep) }).AsMultiInstance();
             container.Register<IDeploymentPipeline, DeploymentPipeline>().AsMultiInstance();
             container.Register<IDeploymentWatcher, DeploymentWatcher>();
+            container.Register<IWebClient, WebClient>();
 
             container.Resolve<IDeploymentWatcher>().Start();
         }

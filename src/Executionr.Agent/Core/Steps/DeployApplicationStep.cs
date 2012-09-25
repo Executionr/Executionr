@@ -10,13 +10,12 @@ namespace Executionr.Agent.Core.Steps
     public class DeployApplicationStep : IDeploymentStep
     {
         private const string FileName = "deploy";
-        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
-
         private readonly string[] Extensions;
+        private IEnvironment _environment;
 
         public DeployApplicationStep(IEnvironment environment)
         {
-            if (environment.IsNix)
+            if (environment.IsUnix)
             {
                 Extensions = new string[] { ".sh", ".exe" };
             } 
@@ -24,25 +23,34 @@ namespace Executionr.Agent.Core.Steps
             {
                 Extensions = new string[] { ".bat", ".ps1", ".exe" };
             }
+
+            _environment = environment;
         }
 
         #region IDeploymentStep implementation
 
-        public void Run(Deployment deployment, dynamic state)
+        public void Run(Deployment deployment, IDeploymentLogger log, dynamic state)
         {
-            string dir = deployment.ApplicationPath();
             bool found = false;
 
             foreach (var extension in Extensions)
             {
-                Log.Info("Looking for {0}{1}...", FileName, extension);
+                log.Info("Looking for {0}{1}...", FileName, extension);
 
-                string filePath = Path.Combine(dir, string.Concat(FileName, extension));
+                string filePath = Path.Combine(deployment.ApplicationPath(), string.Concat(FileName, extension));
 
                 if (File.Exists(filePath))
                 {
+                    log.Info("Executing {0}{1}...", FileName, extension);
+
                     found = true;
-                    ExecuteScript(filePath, dir);
+
+                    if (_environment.IsUnix)
+                    {
+                        SetUnixExecPermission(filePath);
+                    }
+
+                    ExecuteScript(filePath, log);
                     break;
                 }
             }
@@ -55,13 +63,21 @@ namespace Executionr.Agent.Core.Steps
 
         #endregion
 
-        private void ExecuteScript(string filePath, string workingDirectory)
+        private void SetUnixExecPermission(string filePath)
         {
-            var startInfo = new ProcessStartInfo(filePath);
+            var attribs = File.GetAttributes(filePath);
+            File.SetAttributes (filePath, (FileAttributes)((uint)attribs | 0x80000000)); 
+        }
+
+        private void ExecuteScript(string filePath, IDeploymentLogger log)
+        {
+            var startInfo = new ProcessStartInfo();
+            startInfo.FileName = filePath;
+            startInfo.WorkingDirectory = Path.GetDirectoryName(filePath);
             startInfo.UseShellExecute = false;
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
-            startInfo.WorkingDirectory = workingDirectory;
+            startInfo.CreateNoWindow = true;
 
             var process = Process.Start(startInfo);
             var outputStream = process.StandardOutput;
@@ -69,12 +85,12 @@ namespace Executionr.Agent.Core.Steps
 
             while (!process.WaitForExit(1000))
             {
-                FlushStreamToLog(outputStream, Log.Info);
-                FlushStreamToLog(errorStream, Log.Error);
+                FlushStreamToLog(outputStream, log.Info);
+                FlushStreamToLog(errorStream, log.Error);
             }
 
-            FlushStreamToLog(outputStream, Log.Info);
-            FlushStreamToLog(errorStream, Log.Error);
+            FlushStreamToLog(outputStream, log.Info);
+            FlushStreamToLog(errorStream, log.Error);
 
             if (process.ExitCode != 0)
             {

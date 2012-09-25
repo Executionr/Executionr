@@ -15,6 +15,14 @@ namespace Executionr.Agent.IO
         {
             return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Applications", deployment.Id.ToString());
         }
+
+        public static void EnsureDirectoryExists(this string path)
+        {
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+        }
     }
 }
 

@@ -5,7 +5,7 @@ namespace Executionr.Agent.Core.Steps
 {
     public interface IDeploymentStep
     {
-        void Run(Deployment deployment, dynamic state);
+        void Run(Deployment deployment, IDeploymentLogger logger, dynamic state);
     }
 }
 

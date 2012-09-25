@@ -3,12 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Executionr.Agent", "src\Executionr.Agent\Executionr.Agent.csproj", "{5E118755-8D26-43FA-9381-3585632AF6A8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Executionr.Agent.Tests", "src\Executionr.Agent.Tests\Executionr.Agent.Tests.csproj", "{4633E69C-0C5D-4E79-B226-7E9192393504}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Default|Any CPU = Default|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4633E69C-0C5D-4E79-B226-7E9192393504}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4633E69C-0C5D-4E79-B226-7E9192393504}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4633E69C-0C5D-4E79-B226-7E9192393504}.Default|Any CPU.ActiveCfg = Debug|Any CPU
+		{4633E69C-0C5D-4E79-B226-7E9192393504}.Default|Any CPU.Build.0 = Debug|Any CPU
+		{4633E69C-0C5D-4E79-B226-7E9192393504}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4633E69C-0C5D-4E79-B226-7E9192393504}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5E118755-8D26-43FA-9381-3585632AF6A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5E118755-8D26-43FA-9381-3585632AF6A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E118755-8D26-43FA-9381-3585632AF6A8}.Release|Any CPU.ActiveCfg = Release|Any CPU

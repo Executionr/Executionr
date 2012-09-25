@@ -9,7 +9,7 @@ namespace Executionr.Agent.Core
             get { return Type.GetType("Mono.Runtime") != null; }
         }
 
-        public bool IsNix
+        public bool IsUnix
         {
             get { return System.Environment.OSVersion.Platform == PlatformID.Unix; }
         }
