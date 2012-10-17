@@ -1,6 +1,5 @@
 using System;
 using Raven.Client;
-using NLog;
 using Executionr.Agent.Domain;
 using Executionr.Agent.Core.Steps;
 using System.Collections.Generic;
@@ -18,12 +17,12 @@ namespace Executionr.Agent.Core
             _steps = steps;
         }
 
-        public void Deploy(Deployment deployment)
+        public void Deploy(Execution execution)
         {
-            var log = new DeploymentLogger(deployment, _session, this.GetType());
-            log.Info("Beginning deployment...");
+            var log = new DeploymentLogger(execution, _session, this.GetType());
+            log.Info("Beginning Execution...");
 
-            deployment.State = DeploymentState.Running;
+            execution.State = ExecutionState.Running;
             _session.SaveChanges();
 
             try
@@ -32,18 +31,19 @@ namespace Executionr.Agent.Core
                 foreach (var step in _steps)
                 {
                     log.Info("Running {0}...", step.GetType().Name);
-                    step.Run(deployment, new DeploymentLogger(deployment, _session, step.GetType()), state);
+                    step.Run(execution, new DeploymentLogger(execution, _session, step.GetType()), state);
                 }
 
-                deployment.State = DeploymentState.Completed;
+                execution.State = ExecutionState.Completed;
                 _session.SaveChanges();
             }
             catch (Exception ex)
             {
-                deployment.State = DeploymentState.Failed;
+                execution.State = ExecutionState.Failed;
+                _session.Store(execution);
                 _session.SaveChanges();
 
-                log.ErrorException("Deployment failed.", ex);
+                log.ErrorException("Execution failed.", ex);
             }
         }
 

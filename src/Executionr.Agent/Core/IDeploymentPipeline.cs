@@ -5,7 +5,7 @@ namespace Executionr.Agent.Core
 {
     public interface IDeploymentPipeline : IDisposable
     {
-        void Deploy(Deployment deployment);
+        void Deploy(Execution execution);
     }
 }
 

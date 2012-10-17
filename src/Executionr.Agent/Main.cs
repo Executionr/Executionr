@@ -1,4 +1,5 @@
 using System;
+using System.Configuration;
 using Nancy.Hosting.Self;
 using NLog.Config;
 using NLog.Targets;
@@ -18,6 +19,11 @@ namespace Executionr.Agent
         {
             LoggingConfiguration config = new LoggingConfiguration();
 
+            MemoryTarget target = new MemoryTarget();
+            target.Layout = "${message}";
+
+            SimpleConfigurator.ConfigureForTargetLogging(target, LogLevel.Debug);
+
             ColoredConsoleTarget consoleTarget = new ColoredConsoleTarget();
             config.AddTarget("console", consoleTarget);
             consoleTarget.Layout = "${date:format=HH\\:MM\\:ss} ${logger} ${message}";
@@ -30,7 +36,10 @@ namespace Executionr.Agent
 
         static void InitializeHost()
         {
-            var host = new NancyHost(new Uri("http://localhost:12345"));
+            var hostUri = ConfigurationManager.AppSettings["HostUri"];
+            if (string.IsNullOrEmpty(hostUri))
+                hostUri = "http://localhost:12345";
+            var host = new NancyHost(new Uri(hostUri));
 
             host.Start();
 

@@ -49,8 +49,8 @@ namespace Executionr.Agent.Core
 
                 using (var session = _documentSessionFactory()) 
                 {
-                    var deployments = session.Query<Deployment>()
-                                                .Where(d => d.State == DeploymentState.Scheduled)
+                    var deployments = session.Query<Execution>()
+                                                .Where(d => d.State == ExecutionState.Scheduled)
                                                 .OrderBy(d => d.CreateDate)
                                                 .Take(5);
 

@@ -2,8 +2,6 @@ using System;
 using Executionr.Agent.Domain;
 using System.IO;
 using Executionr.Agent.IO;
-using ICSharpCode.SharpZipLib;
-using NLog;
 using ICSharpCode.SharpZipLib.Zip;
 
 namespace Executionr.Agent.Core.Steps
@@ -12,10 +10,10 @@ namespace Executionr.Agent.Core.Steps
     {
         #region IDeploymentStep implementation
 
-        public void Run(Deployment deployment, IDeploymentLogger log, dynamic state)
+        public void Run(Execution execution, IDeploymentLogger log, dynamic state)
         {
-            string packagePath = deployment.PackagePath();
-            string applicationPath = deployment.ApplicationPath();
+            string packagePath = execution.PackagePath();
+            string unpackingPath = execution.UnpackingPath();
 
             log.Info("Checking zip file integrity...");
 
@@ -23,12 +21,16 @@ namespace Executionr.Agent.Core.Steps
             {
                 log.Info("Unpacking zip file...");
 
-                applicationPath.EnsureDirectoryExists();
+                if(Directory.Exists(unpackingPath))
+                    Directory.Delete(unpackingPath);
+
+                unpackingPath.EnsureDirectoryExists();
+                
                 zipFile.IsStreamOwner = true;
 
                 foreach (ZipEntry entry in zipFile)
                 {
-                    string path = Path.Combine(applicationPath, entry.Name);
+                    string path = Path.Combine(unpackingPath, entry.Name);
 
                     if (entry.IsDirectory && !Directory.Exists(path))
                     {

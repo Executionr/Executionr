@@ -17,12 +17,11 @@ namespace Executionr.Agent.Tests
         public void StepUnpacksPackage()
         {
             var step = new UnpackPackageStep();
-            var deployment = new Deployment()
+            var deployment = new Execution()
             {
                 Id = 1,
-                State = DeploymentState.Scheduled,
-                Url = new Uri("http://www.executionr.net/packages/1.nupkg"),
-                Version = "1.0.0.0"
+                State = ExecutionState.Scheduled,
+                UrlToPackage = new Uri("http://www.executionr.net/packages/1.nupkg")
             };
             var packagePath = deployment.PackagePath();
             var applicationPath = deployment.ApplicationPath();

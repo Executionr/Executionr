@@ -8,14 +8,14 @@ namespace Executionr.Agent.Core
     public class DeploymentLogger : IDeploymentLogger
     {
         private Logger _logger;
-        private Deployment _deployment;
+        private Execution execution;
         private IDocumentSession _session;
 
-        public DeploymentLogger(Deployment deployment, IDocumentSession session, Type loggerType)
+        public DeploymentLogger(Execution execution, IDocumentSession session, Type loggerType)
         {
-            _deployment = deployment;
+            this.execution = execution;
             _session = session;
-            _logger = LogManager.GetLogger("DeploymentLogger", loggerType);
+            _logger = LogManager.GetLogger("DeploymentLogger");
         }
 
         #region IDeploymentLogger implementation
@@ -26,14 +26,14 @@ namespace Executionr.Agent.Core
 
             if (args != null && args.Length > 0)
             {
-                _deployment.Log.Add(string.Format(message, args));
+                execution.Log.Add(string.Format(message, args));
             }
             else
             {
-                _deployment.Log.Add(message);
+                execution.Log.Add(message);
             }
 
-            if (_deployment.Log.Count % 5 == 0)
+            if (execution.Log.Count % 5 == 0)
             {
                 Flush();
             }
@@ -45,14 +45,14 @@ namespace Executionr.Agent.Core
             
             if (args != null && args.Length > 0)
             {
-                _deployment.Log.Add(string.Format(message, args));
+                execution.Log.Add(string.Format(message, args));
             }
             else
             {
-                _deployment.Log.Add(message);
+                execution.Log.Add(message);
             }
             
-            if (_deployment.Log.Count % 5 == 0)
+            if (execution.Log.Count % 5 == 0)
             {
                 Flush();
             }
@@ -61,9 +61,9 @@ namespace Executionr.Agent.Core
         public void ErrorException(string message, Exception ex)
         {
             _logger.ErrorException(message, ex);
-            _deployment.Log.Add(message + ex);
+            execution.Log.Add(message + ex);
 
-            if (_deployment.Log.Count % 5 == 0)
+            if (execution.Log.Count % 5 == 0)
             {
                 Flush();
             }

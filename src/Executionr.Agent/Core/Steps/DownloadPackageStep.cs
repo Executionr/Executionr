@@ -1,65 +1,46 @@
 using System;
 using Executionr.Agent.Domain;
-using NLog;
 using System.IO;
 using Executionr.Agent.IO;
 using Executionr.Agent.Net;
+using Raven.Client;
 
 namespace Executionr.Agent.Core.Steps
 {
     public class DownloadPackageStep : IDeploymentStep
     {
-        private IHasher _hasher;
         private IWebClient _webClient;
+        private readonly IDocumentSession documentSession;
 
-        public DownloadPackageStep(IWebClient webClient, IHasher hasher)
+        public DownloadPackageStep(IWebClient webClient, IDocumentSession documentSession)
         {
             _webClient = webClient;
-            _hasher = hasher;
+            this.documentSession = documentSession;
         }
 
         #region IDeploymentStep implementation
 
-        public void Run(Deployment deployment, IDeploymentLogger log, dynamic state)
+        public void Run(Execution execution, IDeploymentLogger log, dynamic state)
         {
-            string path = deployment.PackagePath();
-            bool download = true;
-
-            log.Info("Checking package cache...", deployment.Url);
+            string path = execution.PackagePath();
+            
+            log.Info("Checking package package exists...", execution.UrlToPackage);
 
             if (File.Exists(path))
             {
-                log.Info("Package has already been downloaded, checking hash...");
-
-                using (var stream = File.OpenRead(path))
-                {
-                    if (_hasher.ValidateHash(stream, deployment.Hash))
-                    {
-                        log.Info("Hashes match, no need to download the package again.");
-                        download = false;
-                    }
-                    else
-                    {
-                        log.Info("Hashes do NOT match, the package must be downloaded again.");
-                        File.Delete(path);
-                    }
-                }
+                log.Info("Package has already been downloaded. Deleting old package");
+                File.Delete(path);
             }
 
-            if (download)
-            {
-                log.Info("Dowloading package @ {0}...", deployment.Url);
+            execution.Log.Add(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss: ") + "Starting download of package " + execution.UrlToPackage + " to destination " + path + ".");
+            documentSession.SaveChanges();
 
-                _webClient.DownloadFile(deployment.Url, path);
-            }
+            log.Info("Dowloading package @ {0}...", execution.UrlToPackage);
+            _webClient.DownloadFile(execution.UrlToPackage, path);
 
-            using (var stream = File.OpenRead(path))
-            {
-                if (!_hasher.ValidateHash(stream, deployment.Hash))
-                {
-                    throw new DeploymentException("The hashes did not match after downloading the package.");
-                }
-            }
+            execution.Log.Add(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss: ") + "Finished download of package " + execution.UrlToPackage + " to destination " + path + ".");
+            documentSession.SaveChanges();
+            
         }
 
         #endregion
