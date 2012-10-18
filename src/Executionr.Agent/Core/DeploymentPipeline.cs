@@ -23,6 +23,7 @@ namespace Executionr.Agent.Core
             log.Info("Beginning Execution...");
 
             execution.State = ExecutionState.Running;
+            _session.Store(execution);
             _session.SaveChanges();
 
             try
@@ -35,6 +36,7 @@ namespace Executionr.Agent.Core
                 }
 
                 execution.State = ExecutionState.Completed;
+                _session.Store(execution);
                 _session.SaveChanges();
             }
             catch (Exception ex)

@@ -120,6 +120,7 @@
     <Compile Include="Core\DeploymentWatcher.cs" />
     <Compile Include="Core\DeploymentPipeline.cs" />
     <Compile Include="Domain\ExecutionState.cs" />
+    <Compile Include="Modules\AdminModule.cs" />
     <Compile Include="Modules\ExecutionModule.cs" />
     <Compile Include="Core\Steps\IDeploymentStep.cs" />
     <Compile Include="Core\Steps\UnpackPackageStep.cs" />
@@ -146,7 +147,35 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Raven.Studio.xap" />
+    <Content Include="static\admin.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="static\img\glyphicons-halflings-white.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="static\img\glyphicons-halflings.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="static\scripts\angular-bootstrap.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="static\scripts\angular.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="static\scripts\bootstrap.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="static\scripts\jquery-1.8.2.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="static\styles\bootstrap-responsive.min.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="static\styles\bootstrap.min.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
+  <ItemGroup />
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>

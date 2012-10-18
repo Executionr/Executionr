@@ -1,5 +1,6 @@
 using System;
 using Nancy;
+using Nancy.Conventions;
 using Raven.Client;
 using Raven.Client.Embedded;
 using Executionr.Agent.IO;
@@ -32,6 +33,24 @@ namespace Executionr.Agent.Core
             container.Register<IWebClient, WebClient>();
 
             container.Resolve<IDeploymentWatcher>().Start();
+
+        }
+
+        protected override void ConfigureConventions(NancyConventions conventions)
+        {
+            base.ConfigureConventions(conventions);
+
+            conventions.StaticContentsConventions.Add(
+                StaticContentConventionBuilder.AddDirectory("static/img", @"static/img")
+            );
+
+            conventions.StaticContentsConventions.Add(
+               StaticContentConventionBuilder.AddDirectory("static/scripts", @"static/scripts")
+           );
+
+            conventions.StaticContentsConventions.Add(
+               StaticContentConventionBuilder.AddDirectory("static/styles", @"static/styles")
+           );
         }
     }
 }

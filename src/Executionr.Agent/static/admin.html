@@ -1,0 +1,125 @@
+﻿<!DOCTYPE html>
+<html lang="en" ng-app>
+  <head>
+    <meta charset="utf-8">
+    <title>Executionr Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Executionr html admin view">
+    <meta name="author" content="Emil Cardell">
+
+    <!-- Le styles -->
+    <link href="/static/styles/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        }
+    </style>
+    <link href="/static/styles/bootstrap-responsive.min.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <style type="text/css">
+    </style>
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">Executionr</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="active"><a href="#">Executions</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container" ng-controller="executionListController">
+        <div id="execution-list">
+            <h1>Executions</h1>
+            <table class="table table-condensed">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Package Id</th>
+                        <th>Package version</th>
+                        <th>Created</th>
+                        <th>Status</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="execution in executions">
+                        <td>{{execution.Id}}</td>
+                        <td>{{execution.PackageId}}</td>
+                        <td>{{execution.PackageVersion}}</td>
+                        <td>{{execution.CreateDate}}</td>
+                        <td><span class="label {{execution.Style}}">{{execution.Status}}</span></td>
+                        <td><a href="#logModal" class="btn btn-mini" data-toggle="modal" ng-click="loadLogs(execution.Id)">Show log</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="modal hide" id="logModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">Modal header</h3>
+          </div>
+          <div class="modal-body">
+              <ul>
+                  <li ng-repeat="log in logs">
+                      {{log}}
+                  </li>
+              </ul>
+          </div>
+          <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+          </div>
+        </div>
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+      <script src="/static/scripts/jquery-1.8.2.min.js"></script>
+      <script src="/static/scripts/angular.min.js"></script>
+      <script src="/static/scripts/angular-bootstrap.min.js"></script>
+      <script src="/static/scripts/bootstrap.min.js"></script>
+      
+      
+      <script language="javascript">
+          
+          function executionListController($scope, $http) {
+
+              $scope.logs = [];
+
+              $scope.loadLogs = function(executionId) {
+                  $http.get('/execution/' + executionId).success(function (data) {
+                      $scope.logs = data.Log;
+                  });
+              };
+
+              $http.get('/admin/executions').success(function (data) {
+                  $scope.executions = data;
+              });
+              
+          }
+
+      </script>
+
+  </body>
+</html>
