@@ -19,8 +19,7 @@ namespace Executionr.Agent.Domain
         public string PackageId { get; set; }
         public string PackageVersion { get; set; }
         public Uri UrlToPackage { get; set; }
-
-        
+        public string ExecutionArguments { get; set; }
     }
 }
 

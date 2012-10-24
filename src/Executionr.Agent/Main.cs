@@ -1,5 +1,9 @@
 using System;
+using System.Collections;
 using System.Configuration;
+using System.Configuration.Install;
+using System.Linq;
+using System.ServiceProcess;
 using Nancy.Hosting.Self;
 using NLog.Config;
 using NLog.Targets;
@@ -11,8 +15,28 @@ namespace Executionr.Agent
     {
         public static void Main(string[] args)
         {
-            ConfigureLogging();
-            InitializeHost();
+            if(args.Any(x => x.Equals("-install", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                InstallService(args);
+                return;
+            }
+
+            if (args.Any(x => x.Equals("-uninstall", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                UninstallService(args);
+                return;
+            }
+
+            if (args.Any(x => x.Equals("-console", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                ConfigureLogging();
+                InitializeHost();
+                return;
+            }
+
+            ServiceBase[] services = { new ExecutionrService(),  };
+            ServiceBase.Run(services);
+
         }
 
         static void ConfigureLogging()
@@ -47,5 +71,67 @@ namespace Executionr.Agent
 
             host.Stop();
         }
+
+        static void InstallService(string[] args)
+        {
+            try
+            {
+                Console.WriteLine("installing");
+                using (AssemblyInstaller inst = new AssemblyInstaller(typeof(ExecutionrService).Assembly, args))
+                {
+                    IDictionary state = new Hashtable();
+                    inst.UseNewContext = true;
+                    try
+                    {
+                            inst.Install(state);
+                            inst.Commit(state);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            inst.Rollback(state);
+                        }
+                        catch { }
+                        throw;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex.Message);
+            }
+        }
+
+        static void UninstallService(string[] args)
+        {
+            try
+            {
+                Console.WriteLine("uninstalling");
+                using (AssemblyInstaller inst = new AssemblyInstaller(typeof(MainClass).Assembly, args))
+                {
+                    IDictionary state = new Hashtable();
+                    inst.UseNewContext = true;
+                    try
+                    {
+                        inst.Uninstall(state);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            inst.Rollback(state);
+                        }
+                        catch { }
+                        throw;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex.Message);
+            }
+        }
+    
     }
 }

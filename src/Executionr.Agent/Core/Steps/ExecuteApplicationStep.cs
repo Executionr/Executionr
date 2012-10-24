@@ -78,12 +78,13 @@ namespace Executionr.Agent.Core.Steps
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
             startInfo.CreateNoWindow = true;
+            startInfo.Arguments = execution.ExecutionArguments;
 
             var process = Process.Start(startInfo);
             var outputStream = process.StandardOutput;
             var errorStream = process.StandardError;
 
-            while (!process.WaitForExit(1000))
+            while (!process.WaitForExit(10000))
             {
                 FlushStreamToLog(outputStream, log.Info, execution);
                 FlushStreamToLog(errorStream, log.Error, execution);
@@ -94,6 +95,9 @@ namespace Executionr.Agent.Core.Steps
 
             if (process.ExitCode != 0)
             {
+                execution.Log.Add(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss: ") + "Execution scripted exited with status code " + process.ExitCode);
+                documentSession.Store(execution);
+                documentSession.SaveChanges();
                 throw new DeploymentException("The script exited with a non-zero exit code.");
             }
         }
@@ -106,6 +110,7 @@ namespace Executionr.Agent.Core.Steps
                 log(line, null);
 
                 execution.Log.Add(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss: ") + line);
+                documentSession.Store(execution);
                 documentSession.SaveChanges();
             }
         }

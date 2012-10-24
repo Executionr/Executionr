@@ -30,6 +30,7 @@ namespace Executionr.Agent.Modules
                 executionToCreate.LastUpdated = DateTime.Now;
                 executionToCreate.UrlToPackage = new Uri(model.UrlToPackage);
                 executionToCreate.State = ExecutionState.Scheduled;
+                executionToCreate.ExecutionArguments = model.ExecutionArguments;
                 
                 documentSession.Store(executionToCreate);
                 documentSession.SaveChanges();
@@ -56,6 +57,7 @@ namespace Executionr.Agent.Modules
     {
         [Required]
         public string UrlToPackage { get; set; }
+        public string ExecutionArguments { get; set; }
     }
 }
 
